@@ -8,38 +8,56 @@ NAME_REGEX = re.compile('^[^0-9]+$')
 
 
 class UserManager(models.Manager):
-    def register(self, first_name, last_name, email, password, confirm_password):
-        if len(first_name) < 2:
-            return{'errors':['First name must be at least 2 characters']}
-        elif  len(first_name)==0 | len(last_name)==0 | len(email)==0 | len(password)==0 |len(confirm_password)==0:
-            return{'errors':['All fields are required']}
-        elif len(last_name) < 2:
-            return{'errors':['Last name must be at least 2 characters']}
-        elif not NAME_REGEX.match(first_name):
-            return{'errors':['First name must be letters only']}
-        elif not NAME_REGEX.match(last_name):
-            return{'errors':['Last name must be letters only']}
-        elif not EMAIL_REGEX.match(email):
-            return{'errors':['Email not in valid format']}
-        elif password != confirm_password:
-            return{'errors': ['Passwords do not match']}
-        elif len(password) < 8:
-            return{'errors':['Password must be at least 8 characters']}
-        elif User.objects.filter(email=email).exists():
-            return{'errors':['This email is already registered']}
+    def register(self, data):
+        errors =[]
+        useremail = ""
+        if len(data['first']) < 2:
+            errors.append('First name must be at least 2 characters')
+            print errors
+            pass
+        if len(data['last']) < 2:
+            errors.append('Last name must be at least 2 characters')
+            print errors
+            pass
+        if not NAME_REGEX.match(data['first']):
+            errors.append('First name must be letters only')
+            pass
+        if not NAME_REGEX.match(data['last']):
+            errors.append('Last name must be letters only')
+            pass
+        if not EMAIL_REGEX.match(data['email']):
+            errors.append('Email not in valid format')
+            print "email match"
+            pass
+        # elif birth >= datetime.datetime.now()
+        if data['password'] != data['confirm']:
+            errors.append('Passwords do not match')
+            pass
+        if len(data['password']) < 8:
+            errors.append('Password must be at least 8 characters')
+            pass
+        if User.objects.filter(email=data['email']).exists():
+            errors.append('This email is already registered')
+            pass
+        if errors:
+            return{'errors': errors}
         else:
             print "successful register"
-            return{'useremail': email}
+            useremail = data['email']
+            return{"useremail": data['email']}
 
-    def login(self, email, password):
-        if not User.objects.filter(email=email).exists():
-            return{'errors':['Email address not found in system']}
+
+    def login(self, data):
+        errors = []
+        if not User.objects.filter(email=data['email']).exists():
+            errors.append('Email is not recognized')
+            return{'errors':errors}
         else:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=data['email'])
             print "in else statement"
             print user.password
             if user.password != password:
-                return{'errors':['Incorrect Password']}
+                errors.append('Incorrect Password')
             else:
                 return{'first':user.first_name}
 

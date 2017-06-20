@@ -12,8 +12,12 @@
         </header>
         <form id="login" action='/login' method='POST'>
             <h2>Login:</h2>
-            {% if request.session.logerrors %}
-            <h2>{{request.session.logerrors}}</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "login" in message.tags %}
+                        <p>{{message}}</p>
+                    {% endif %}
+                {% endfor %}
             {% endif %}
             {% csrf_token %}
             Email Address: <input type = "text" name="email" value="email">
@@ -22,13 +26,18 @@
         </form>
         <form id="register" action='/register' method='POST'>
             <h2>Register:</h2>
-            {% if request.session.errors %}
-            <h2>{{request.session.errors}}</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if "register" in message.tags %}
+                        <p>{{message}}</p>
+                    {% endif %}
+                {% endfor %}
             {% endif %}
             {% csrf_token %}
             First Name: <input type="text" name="first" value="first">
             Last Name: <input type="text" name="last" value="last">
             Email Address: <input type = "text" name="email" value="email">
+            Birthday(DD/MM/YYYY): <input type="text" name="birth">
             Password: <input type="password" name="password" value="password">
             Confirm Password: <input type="password" name="confirm" value="confirm">
             <input type="submit" value="Submit"> 
