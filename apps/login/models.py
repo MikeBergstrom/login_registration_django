@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 import re
+import datetime
 EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
 NAME_REGEX = re.compile('^[^0-9]+$')
 
@@ -11,6 +12,12 @@ class UserManager(models.Manager):
     def register(self, data):
         errors =[]
         useremail = ""
+        month, day, year = map(int, data['birth'].split('/'))
+        print year
+        print month
+        print day
+        print datetime.date.today()
+        print datetime.date(year, month, day)
         if len(data['first']) < 2:
             errors.append('First name must be at least 2 characters')
             print errors
@@ -29,7 +36,9 @@ class UserManager(models.Manager):
             errors.append('Email not in valid format')
             print "email match"
             pass
-        # elif birth >= datetime.datetime.now()
+        if datetime.date(year, month, day) >= datetime.date.today():
+            errors.append('Birth date must be in the past')
+            pass
         if data['password'] != data['confirm']:
             errors.append('Passwords do not match')
             pass
